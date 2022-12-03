@@ -1,0 +1,10 @@
+Possible algorithms:
+Price time
+FIFO
+Pro rata algorithm
+
+Tasks:
+Database Schema
+API endpoints
+Trading algorithm
+Integration of trading algorithm and gateway 

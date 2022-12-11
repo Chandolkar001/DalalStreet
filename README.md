@@ -26,6 +26,7 @@ source venv/bin/activate
 
 #### Installing Dependencies:
 ```
+cd wallstreet
 pip install -r requirements.txt
 ```
 #### Make migrations:
@@ -37,6 +38,22 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
+> #### Running on Docker:
+#### Install Docker on your system:
+<href>https://docs.docker.com/engine/install/</href>
+```
+return to DalalStreet directory: cd ..
+```
+#### Run the following commands to build Docker image and then run docker container:
+```
+docker-compose build
+docker-compose up -d
+```
+#### To stop the container:
+```
+docker-compose down
+```
+
 
 
 

@@ -5,44 +5,63 @@ class User(AbstractUser):
     phone_no = models.CharField(max_length=10, null=True)
 
     def __str__(self):
-        return str(self.username)
+        return str(self.id) + str(self.username)
 
-class Portfolio(models.Model):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE
-    )
-    balance = models.BigIntegerField(default=2000000)
-
-    def __str__(self):
-        return str(self.user.username)
+class Profile(models.Model):
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE)
+    rank = models.IntegerField(default=-1)
+    no_of_shares = models.IntegerField(default=0)
+    cash = models.IntegerField(default=200000)
+    net_worth = models.IntegerField(default=0) # 60 % share valuation 40 % cash valuation
+    
+    def __str__(self) -> str:
+        return self.user_id.username + "'s Profile"
 
 # Newly edited code for ipo functionality
 
-class Security(models.Model):
+class Company(models.Model):
 # Relevant for both cases -- 
-    security_id = models.IntegerField(null=False)
-    security_name = models.CharField(max_length=128)
+    company_name = models.CharField(max_length=128)
     short_name = models.CharField(max_length=8)
     total_no_shares = models.IntegerField(default=0)
-
-# is listed shall act as switch to determine if a security is treated as a stock or an ipo
-# If false, all the ipo fields are relevant
-# If true, all the stock fields are relevant
-
     is_listed = models.BooleanField(default=False)
-    
-# IPO Fields
-    ipo_lot_min_val = models.IntegerField(default=0)
-    ipo_lot_max_val = models.IntegerField(default=0)
-    ipo_face_value = models.IntegerField(default=0)
-    ipo_lot_size = models.IntegerField(default=0)
-# IPO Fields end
 
-# Stock Fields
-    listing_price = models.IntegerField(default=0)
-    share_price = models.IntegerField(default=0)
-# Stock Fields end   
- 
     def __str__(self) -> str:
-        return self.company_name + '_' + str(self.ipo_face_value if not self.is_listed else self.share_price) + str(self.is_listed)
+        return self.company_name
+
+class IPO(models.Model):
+    company = models.OneToOneField(Company, on_delete=models.CASCADE)
+    high_cap = models.IntegerField(default=0)
+    low_cap = models.IntegerField(default=0)
+    lot_allowed = models.IntegerField(default=0)
+    total_volume = models.IntegerField(default=0)
+    subscribers = models.ManyToManyField(User, blank=True)
+    final_issue_price = models.IntegerField(default=0)
+    shares_alloted = models.IntegerField(default=0)
+    cash_received = models.IntegerField(default=0)
+
+    def __str__(self) -> str:
+        return str(self.id)
+
+class Subscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0) 
+    offer_bid = models.IntegerField(default=0)
+
+
+    def __str__(self):
+        return str(self.id)
+
+class Transaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    is_buy_type = models.BooleanField(default=False)
+    time_placed = models.DateTimeField(auto_now_add=True)
+    quantity = models.IntegerField()
+    price_placed = models.IntegerField()
+
+    def __str__(self):
+        return str(self.id)
+
 

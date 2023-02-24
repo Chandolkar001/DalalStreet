@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import User, Portfolio
+from .models import *
+from import_export.admin import ImportExportActionModelAdmin
+from .utils import resolve_ipo_allotment
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username','email')
@@ -12,8 +14,29 @@ class UserAdmin(admin.ModelAdmin):
     )
     
 class PortfolioAdmin(admin.ModelAdmin):
-    list_display = ('user', 'balance')
+    list_display = ('rank', 'user_id', 'no_of_shares', 'cash', 'net_worth')
 
+    class Meta:
+        ordering = ['rank']
+
+class CompanyAdmin(ImportExportActionModelAdmin):
+    list_display = ('company_name', 'total_no_shares', 'is_listed')
+
+class IPOAdmin(admin.ModelAdmin):
+    list_display = ('company', 'high_cap', 'low_cap', 'lot_allowed', 'total_volume', 'final_issue_price', 'shares_alloted', 'cash_received')
+
+class SubsAdmin(admin.ModelAdmin):
+    list_display = ('user', 'company', 'quantity', 'offer_bid')
+    actions = ['resolve_ipo']
+
+    def resolve_ipo(self, request, queryset):
+        resolve_ipo_allotment()
+        self.message_user(request, 'Function called successfully')
+    resolve_ipo.short_description = 'IPO allotment'
 
 admin.site.register(User, UserAdmin)
-admin.site.register(Portfolio, PortfolioAdmin)
+admin.site.register(Profile, PortfolioAdmin)
+admin.site.register(Company, CompanyAdmin)
+admin.site.register(IPO, IPOAdmin)
+admin.site.register(Subscription, SubsAdmin)
+# admin.site.register(News)

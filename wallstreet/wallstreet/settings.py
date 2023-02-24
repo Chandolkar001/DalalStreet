@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'core',
+    'import_export',
 ]
 
 MIDDLEWARE = [

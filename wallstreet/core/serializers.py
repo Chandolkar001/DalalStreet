@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import User, Portfolio, Security
+from .models import *
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
@@ -23,15 +23,43 @@ class UserSerializer(serializers.ModelSerializer):
         )
         user.set_password(data['password'])
         user.save()
-        Portfolio.objects.update_or_create(user = user)
+        Profile.objects.update_or_create(user_id = user)
         return user
 
-class IPOSerializer(serializers.ModelSerializer):
+class CompanySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Security
-        exclude = ["listing_price", "share_price"]
+        model = Company
+        fields = ["id", "company_name", "short_name", "total_no_shares"]
 
-class StockSerializer(serializers.ModelSerializer):
+class IPOSerializer(serializers.ModelSerializer):
+    # remove subscribers field during the actual game
     class Meta:
-        model = Security
-        exclude = ["ipo_lot_min_value","ipo_lot_max_value","ipo_lot_size","ipo_face_value"]
+        model = IPO
+        fields = ["company", "high_cap", "low_cap", "lot_allowed", "total_volume", "subscribers"]
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, instance):
+        return self.context['request'].user
+        
+    class Meta:
+        model = Subscription
+        fields = ["user", "company", "quantity", "offer_bid"]
+
+class SubsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = ["company", "quantity", "offer_bid"]
+
+class TransactionSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, instance):
+        return self.context['request'].user
+        
+    class Meta:
+        model = Transaction
+        fields = ["user", "company", "is_buy_type", "time_placed", "quantity", "price_placed"]
+
+

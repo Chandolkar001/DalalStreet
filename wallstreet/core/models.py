@@ -25,7 +25,8 @@ class Company(models.Model):
     short_name = models.CharField(max_length=8)
     total_no_shares = models.IntegerField(default=0)
     is_listed = models.BooleanField(default=False)
-
+    listing_price = models.IntegerField(default=0)
+    last_traded_price = models.IntegerField(default=0)
     def __str__(self) -> str:
         return self.company_name
 
@@ -53,15 +54,52 @@ class Subscription(models.Model):
     def __str__(self):
         return str(self.id)
 
-class Transaction(models.Model):
+# class Stock(models.Model):
+
+
+class BuyOrder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    is_buy_type = models.BooleanField(default=False)
     time_placed = models.DateTimeField(auto_now_add=True)
     quantity = models.IntegerField()
-    price_placed = models.IntegerField()
+    bid_price = models.IntegerField()
 
     def __str__(self):
         return str(self.id)
+
+class SellOrder(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    time_placed = models.DateTimeField(auto_now_add=True)
+    quantity = models.IntegerField()
+    ask_price = models.IntegerField()
+
+    def __str__(self):
+        return str(self.id)
+
+# # Shorting application to be implemented. 
+# class ShortOrder(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+#     time_placed = models.DateTimeField(auto_now_add=True)
+#     quantity = models.IntegerField()
+#     # ask_price = models.IntegerField()
+
+#     def __str__(self):
+#         return str(self.id)
+    
+class ShortOrder(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    price = models.IntegerField()
+    time_placed = models.DateTimeField(auto_now_add=True)
+    closed_at = models.DateTimeField(null=True, blank=True)
+    # status = models.CharField(max_length=10, default='Open')
+    # profit_loss = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+
 
 

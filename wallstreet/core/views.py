@@ -53,5 +53,53 @@ class AddIPOSubscriptionView(generics.CreateAPIView):
 
         return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)
 
- 
 
+class BuyOrderView(generics.ListAPIView):
+    serializer_class = BuyOrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return BuyOrder.objects.filter(user=self.request.user)
+ 
+class AddBuyOrderView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = BuyOrderSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(id=request.user.id)
+        company_id = int(request.data['company'])
+        quantity = int(request.data['quantity'])
+        bid_price = int(request.data['bid_price']) 
+
+        comp = Company.objects.filter(company=company_id)
+        if (bid_price <= (0.1*comp.last_traded_price+comp.last_traded_price) and bid_price >= (comp.last_traded_price - 0.1*comp.last_traded_price)):
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=request.user)
+            return Response({"message" : "Buy Order placed successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)
+
+class SellOrderView(generics.ListAPIView):
+    serializer_class = SellOrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return SellOrder.objects.filter(user=self.request.user)
+    
+class AddSellOrderView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SellOrderSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(id=request.user.id)
+        company_id = int(request.data['company'])
+        quantity = int(request.data['quantity'])
+        ask_price = int(request.data['ask_price']) 
+
+        comp = Company.objects.filter(company=company_id)
+        if (ask_price <= (0.1*comp.last_traded_price+comp.last_traded_price) and ask_price >= (comp.last_traded_price - 0.1*comp.last_traded_price)):
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=request.user)
+            return Response({"message" : "Sell Order placed successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)

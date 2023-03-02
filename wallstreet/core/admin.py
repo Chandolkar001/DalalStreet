@@ -34,9 +34,17 @@ class SubsAdmin(admin.ModelAdmin):
         self.message_user(request, 'Function called successfully')
     resolve_ipo.short_description = 'IPO allotment'
 
+class BuyOrderAdmin(admin.ModelAdmin):
+    list_display = ('company', 'user', 'time_placed', 'quantity', 'bid_price')
+
+class SellOrderAdmin(admin.ModelAdmin):
+    list_display = ('company', 'user', 'time_placed', 'quantity', 'ask_price')
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Profile, PortfolioAdmin)
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(IPO, IPOAdmin)
 admin.site.register(Subscription, SubsAdmin)
+admin.site.register(BuyOrder, BuyOrderAdmin)
+admin.site.register(SellOrder, SellOrderAdmin)
 # admin.site.register(News)

@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'core',
+    'news',
     'import_export',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +136,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
 }
+
+
+# Celery settings
+CELERY_BROKER_URL = 'amqp://localhost'

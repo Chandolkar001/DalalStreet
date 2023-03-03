@@ -52,14 +52,34 @@ class SubsSerializer(serializers.ModelSerializer):
         model = Subscription
         fields = ["company", "quantity", "offer_bid"]
 
-class TransactionSerializer(serializers.ModelSerializer):
+class BuyOrderSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
 
     def get_user(self, instance):
         return self.context['request'].user
         
     class Meta:
-        model = Transaction
-        fields = ["user", "company", "is_buy_type", "time_placed", "quantity", "price_placed"]
+        model = BuyOrder
+        fields = ["user", "company", "quantity", "bid_price"]
 
+class SellOrderSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
 
+    def get_user(self, instance):
+        return self.context['request'].user
+        
+    class Meta:
+        model = SellOrder
+        fields = ["user", "company", "time_placed", "quantity", "ask_price"]
+
+# ShortOrderSerializer to be implemented
+
+class ShortOrderSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, instance):
+        return self.context['request'].user
+        
+    class Meta:
+        model = ShortOrder
+        fields = ["user", "company", "time_placed", "quantity", "price","closed_at"]

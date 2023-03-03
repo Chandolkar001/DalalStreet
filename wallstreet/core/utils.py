@@ -1,4 +1,5 @@
 from .models import *
+import time
 
 def checkifvalidIPO(company_id, quantity, offer_bid):
     low_cap = IPO.objects.get(company = company_id).low_cap
@@ -51,10 +52,36 @@ def resolve_ipo_allotment():
         ipo.cash_received = cash_received
         ipo.save()
 
-def PriceTimePriorityAlgorithm():
-    buy_orders = list(Transaction.objects.filter(is_buy_type = True))
-    sell_orders = list(Transaction.objects.filter(is_buy_type = False))
+orders = []
+def add_order(order_type, price, quantity):
+    order = {
+        "id": len(orders) + 1,
+        "type": order_type,
+        "price": price,
+        "quantity": quantity,
+        "timestamp": time.time()
+    }
+    orders.append(order)
 
-    buy_orders.sort(key=lambda x: (x.price_placed, x.time_placed), reverse=True)
-    sell_orders.sort(key=lambda x: (x.price, x.time))
+def remove_order(order_id):
+    for order in orders:
+        if order["id"] == order_id:
+            orders.remove(order)
+            break
+
+def match_orders():
+    buy_orders = [order for order in orders if order["type"] == "buy"]
+    sell_orders = [order for order in orders if order["type"] == "sell"]
+    for buy_order in buy_orders:
+        for sell_order in sell_orders:
+            if sell_order["price"] <= buy_order["price"]:
+                trade_quantity = min(buy_order["quantity"], sell_order["quantity"])
+                trade_price = sell_order["price"]
+                print(f"Trade executed: buy order {buy_order['id']} and sell order {sell_order['id']} for {trade_quantity} shares at {trade_price}")
+                buy_order["quantity"] -= trade_quantity
+                sell_order["quantity"] -= trade_quantity
+                if buy_order["quantity"] == 0:
+                    remove_order(buy_order["id"])
+                if sell_order["quantity"] == 0:
+                    remove_order(sell_order["id"])
 

@@ -71,34 +71,45 @@ def remove_order(order_id):
             break
 
 def match_orders():
-    print("Executed")
-    # current_time = datetime.now()
-    # time_threshold = current_time - timedelta(minutes=10)
-    # buy_orders = list(BuyOrder.objects.filter(time_placed__gte=time_threshold))
-    # sell_orders = list(SellOrder.objects.filter(time_placed__gte=time_threshold))
-    # for buy_order in buy_orders:
-    #     for sell_order in sell_orders:
-    #         if sell_order.ask_price <= buy_order.bid_price:
-    #             trade_quantity = min(buy_order.quantity, sell_order.quantity)
-    #             trade_price = sell_order.price
-    #             print(f"Trade executed: buy order {buy_order.id} and sell order {sell_order.id} for {trade_quantity} shares at {trade_price}")
-    #             buy_order.quantity -= trade_quantity
-    #             sell_order.quantity -= trade_quantity
-    #             if buy_order.quantity == 0:
-    #                 buy_order.delete()
-    #             else:
-    #                 buy_order.save()
-    #             if sell_order.quantity == 0:
-    #                 sell_order.delete()
-    #             else:
-    #                 sell_order.save()
-    #             buyer = buy_order.user
-    #             seller = sell_order.user
-    #             buyer_cash_delta = -1 * trade_quantity * trade_price
-    #             seller_cash_delta = trade_quantity * trade_price
-    #             buyer.net_worth -= buyer_cash_delta
-    #             buyer.cash += buyer_cash_delta
-    #             seller.net_worth += seller_cash_delta
-    #             seller.cash -= seller_cash_delta
-    #             buyer.save()
-    #             seller.save()
+    # testing code
+
+    # print("Executed")
+    # profs = Profile.objects.all()
+    # for p in profs:
+    #     p.net_worth += 20
+    #     p.save()
+
+    # development code
+
+    current_time = datetime.now()
+    time_threshold = current_time - timedelta(minutes=10)
+    buy_orders = list(BuyOrder.objects.filter(time_placed__gte=time_threshold).order_by('-bid_price'))
+    sell_orders = list(SellOrder.objects.filter(time_placed__gte=time_threshold))
+    for buy_order in buy_orders:
+        for sell_order in sell_orders:
+            if sell_order.ask_price == buy_order.bid_price:
+                trade_quantity = min(buy_order.quantity, sell_order.quantity)
+                trade_price = sell_order.ask_price
+                print(f"Trade executed: buy order {buy_order.id} and sell order {sell_order.id} for {trade_quantity} shares at {trade_price}")
+                buy_order.quantity -= trade_quantity
+                sell_order.quantity -= trade_quantity
+                if buy_order.quantity == 0:
+                    buy_order.delete()
+                else:
+                    buy_order.save()
+                if sell_order.quantity == 0:
+                    sell_order.delete()
+                else:
+                    sell_order.save()
+                buyer = buy_order.user
+                seller = sell_order.user
+                buyer_profile = Profile.objects.get(user=buyer)
+                seller_profile = Profile.objects.get(user=seller)
+                buyer_cash_delta = -1 * trade_quantity * trade_price
+                seller_cash_delta = trade_quantity * trade_price
+                buyer_profile.net_worth -= buyer_cash_delta
+                buyer_profile.cash += buyer_cash_delta
+                seller_profile.net_worth += seller_cash_delta
+                seller_profile.cash -= seller_cash_delta
+                buyer.save()
+                seller.save()

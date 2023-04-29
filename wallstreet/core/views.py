@@ -32,6 +32,13 @@ class IPOSubscriptionView(generics.ListAPIView):
     def get_queryset(self):
         return Subscription.objects.filter(user=self.request.user)
 
+class LeaderboardView(generics.ListAPIView):
+    queryset = (
+        Profile.objects.all().order_by("-net_worth")
+    )
+
+    serializer_class = ProfileSerializer
+
 class AddIPOSubscriptionView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = SubscriptionSerializer

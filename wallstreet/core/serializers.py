@@ -26,6 +26,11 @@ class UserSerializer(serializers.ModelSerializer):
         Profile.objects.update_or_create(user_id = user)
         return user
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = "__all__"
+
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company

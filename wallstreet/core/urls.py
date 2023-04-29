@@ -12,5 +12,6 @@ urlpatterns = [
     path("AddBuyOrders/", AddBuyOrderView.as_view(),name="add-buy-orders"),
     path("SellOrders/", SellOrderView.as_view(),name="sell-orders"),
     path("AddSellOrders/", AddSellOrderView.as_view(),name="sell-orders"),
+    path("leaderboard/", LeaderboardView.as_view(), name="leaderboard"),
 
 ]

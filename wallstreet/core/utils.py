@@ -1,12 +1,15 @@
 from .models import *
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import time
 
 def checkifvalidIPO(company_id, quantity, offer_bid):
     low_cap = IPO.objects.get(company = company_id).low_cap
     lot_allowed = IPO.objects.get(company = company_id).lot_allowed
     total_volume = IPO.objects.get(company = company_id).total_volume
-    if (low_cap < offer_bid and quantity >= lot_allowed and quantity <= total_volume):
+    closing_date = IPO.objects.get(company = company_id).closing_date
+    if date.today() > closing_date:
+        return False
+    elif (low_cap < offer_bid and quantity >= lot_allowed and quantity <= total_volume):
         return True
     else:
         return False

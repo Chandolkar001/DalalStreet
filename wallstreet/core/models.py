@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import datetime
 
 class User(AbstractUser):
     phone_no = models.CharField(max_length=10, null=True)
@@ -40,6 +41,9 @@ class IPO(models.Model):
     final_issue_price = models.IntegerField(default=0)
     shares_alloted = models.IntegerField(default=0)
     cash_received = models.IntegerField(default=0)
+    release_date = models.DateField(default=datetime(2023, 4, 29))
+    closing_date = models.DateField(default=datetime(2023, 5, 14))
+    red_herring_prospectus = models.URLField(default="https://www.google.com/")
 
     def __str__(self) -> str:
         return str(self.id)

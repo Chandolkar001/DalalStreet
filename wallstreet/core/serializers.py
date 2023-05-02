@@ -27,9 +27,14 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class ProfileSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField('get_user_name', read_only=True)
+
     class Meta:
         model = Profile
         fields = "__all__"
+
+    def get_user_name(self,profile_obj):
+        return profile_obj.user_id.username
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,7 +45,7 @@ class IPOSerializer(serializers.ModelSerializer):
     # remove subscribers field during the actual game
     class Meta:
         model = IPO
-        fields = ["company", "high_cap", "low_cap", "lot_allowed", "total_volume", "subscribers"]
+        fields = ["company", "high_cap", "low_cap", "lot_allowed", "total_volume", "subscribers", "release_date","closing_date","red_herring_prospectus"]
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()

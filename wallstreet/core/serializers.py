@@ -45,7 +45,7 @@ class IPOSerializer(serializers.ModelSerializer):
     # remove subscribers field during the actual game
     class Meta:
         model = IPO
-        fields = ["company", "high_cap", "low_cap", "lot_allowed", "total_volume", "subscribers", "release_date","closing_date","red_herring_prospectus"]
+        fields = ["company", "high_cap", "low_cap", "lot_allowed", "total_volume", "release_date","closing_date","red_herring_prospectus"]
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()

@@ -21,7 +21,6 @@ class CompanyListView(generics.ListAPIView):
     queryset = Company.objects.all()
 
 class IPOView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
     serializer_class = IPOSerializer
     queryset = IPO.objects.all()
 

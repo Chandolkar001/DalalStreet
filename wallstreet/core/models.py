@@ -44,6 +44,8 @@ class IPO(models.Model):
     release_date = models.DateField(default=datetime(2023, 4, 29))
     closing_date = models.DateField(default=datetime(2023, 5, 14))
     red_herring_prospectus = models.URLField(default="https://www.google.com/")
+    description = models.TextField(blank=True)
+
 
     def __str__(self) -> str:
         return str(self.id)

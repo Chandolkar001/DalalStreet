@@ -43,9 +43,14 @@ class CompanySerializer(serializers.ModelSerializer):
 
 class IPOSerializer(serializers.ModelSerializer):
     # remove subscribers field during the actual game
+    company_name = serializers.SerializerMethodField('get_company_name', read_only=True)
+
     class Meta:
         model = IPO
-        fields = ["company", "high_cap", "low_cap", "lot_allowed", "total_volume", "release_date","closing_date","red_herring_prospectus", "description"]
+        fields = ["id", "company","company_name", "high_cap", "low_cap", "lot_allowed", "total_volume", "release_date","closing_date","red_herring_prospectus", "description"]
+
+    def get_company_name(self,ipo_obj):
+        return ipo_obj.company.company_name
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()

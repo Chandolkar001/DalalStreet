@@ -4,12 +4,12 @@ import time
 
 def checkifvalidIPO(company_id, quantity, offer_bid):
     low_cap = IPO.objects.get(company = company_id).low_cap
-    lot_allowed = IPO.objects.get(company = company_id).lot_allowed
+    high_cap = IPO.objects.get(company = company_id).high_cap
     total_volume = IPO.objects.get(company = company_id).total_volume
     closing_date = IPO.objects.get(company = company_id).closing_date
     if date.today() > closing_date:
         return False
-    elif (low_cap < offer_bid and quantity >= lot_allowed and quantity <= total_volume):
+    elif (low_cap <= offer_bid and offer_bid <= high_cap and quantity <= total_volume):
         return True
     else:
         return False

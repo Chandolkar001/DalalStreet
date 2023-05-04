@@ -22,6 +22,7 @@ class Profile(models.Model):
 
 class Company(models.Model):
 # Relevant for both cases -- 
+    company_id = models.IntegerField(blank=True, default=101)
     company_name = models.CharField(max_length=128)
     short_name = models.CharField(max_length=8)
     total_no_shares = models.IntegerField(default=0)
@@ -35,7 +36,7 @@ class IPO(models.Model):
     company = models.OneToOneField(Company, on_delete=models.CASCADE)
     high_cap = models.IntegerField(default=0)
     low_cap = models.IntegerField(default=0)
-    lot_allowed = models.IntegerField(default=0)
+    lot_size = models.IntegerField(default=0)
     total_volume = models.IntegerField(default=0)
     subscribers = models.ManyToManyField(User, blank=True)
     final_issue_price = models.IntegerField(default=0)

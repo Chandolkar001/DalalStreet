@@ -23,7 +23,7 @@ class CompanyAdmin(ImportExportActionModelAdmin):
     list_display = ('company_name', 'total_no_shares', 'is_listed')
 
 class IPOAdmin(admin.ModelAdmin):
-    list_display = ('company', 'high_cap', 'low_cap', 'lot_allowed', 'total_volume', 'final_issue_price', 'shares_alloted', 'cash_received')
+    list_display = ('company', 'high_cap', 'low_cap', 'lot_size', 'total_volume', 'final_issue_price', 'shares_alloted', 'cash_received')
 
 class SubsAdmin(admin.ModelAdmin):
     list_display = ('user', 'company', 'quantity', 'offer_bid')

@@ -47,7 +47,7 @@ class IPOSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IPO
-        fields = ["id", "company","company_name", "high_cap", "low_cap", "lot_allowed", "total_volume", "release_date","closing_date","red_herring_prospectus", "description"]
+        fields = ["id", "company","company_name", "high_cap", "low_cap", "lot_size", "total_volume", "release_date","closing_date","red_herring_prospectus", "description"]
 
     def get_company_name(self,ipo_obj):
         return ipo_obj.company.company_name

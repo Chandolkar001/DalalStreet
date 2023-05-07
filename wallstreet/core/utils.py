@@ -17,14 +17,15 @@ def resolve_ipo_allotment():
     for ip in ipo:
         ipo = IPO.objects.get(id=ip.id)
         subscriptions = Subscription.objects.filter(company=ipo.company).order_by('-offer_bid')
-        total_applied_shares = sum([s.quantity for s in subscriptions])
-        total_offer = sum([s.offer_bid for s in subscriptions])
-        lots_available = ipo.total_volume // ipo.lot_allowed
+        total_applied_lots = sum([s.quantity for s in subscriptions])
+        total_applied_shares = total_applied_lots * ipo.lot_size
+        total_offer = sum([(s.offer_bid*ipo.lot_size) for s in subscriptions])
+        lots_available = ipo.total_volume // ipo.lot_size
 
         if total_applied_shares > ipo.total_volume:
             final_issue_price = ipo.high_cap 
         else:
-            final_issue_price = total_offer // len(list(subscriptions))
+            final_issue_price = total_offer / len(list(subscriptions))
         
         shares_allotted = 0
         cash_received = 0
@@ -33,16 +34,16 @@ def resolve_ipo_allotment():
             if lots_available == 0:
                 break
             
-            lots_applied = s.quantity // ipo.lot_allowed
+            lots_applied = s.quantity 
     
             lots_allotted = min(lots_available, lots_applied)
-            shares_allotted += lots_allotted * ipo.lot_allowed
+            shares_allotted += lots_allotted * ipo.lot_size
     
-            cash_received += lots_allotted * final_issue_price * ipo.lot_allowed
-            profile = Profile.objects.get(user_id = s.user.id)
-            profile.no_of_shares += lots_allotted * ipo.lot_allowed
-            profile.cash -= lots_allotted * final_issue_price * ipo.lot_allowed
-            profile.net_worth += int(profile.no_of_shares * final_issue_price * 0.6 + profile.cash * 0.4)
+            cash_received += lots_allotted * final_issue_price * ipo.lot_size
+            profile = Profile.objects.filter(user_id = s.user).first()
+            profile.no_of_shares += lots_allotted * ipo.lot_size
+            profile.cash -= lots_allotted * final_issue_price * ipo.lot_size
+            profile.net_worth += int(lots_allotted * ipo.lot_size * final_issue_price * 0.6 + profile.cash * 0.4)
             profile.save()
     
             ipo.subscribers.add(s.user)

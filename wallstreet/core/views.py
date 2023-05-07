@@ -56,7 +56,7 @@ class AddIPOSubscriptionView(generics.CreateAPIView):
 
         if checkifvalidIPO(company_id, quantity, offer_bid):
             comp = Company.objects.filter(company_id=company_id).first()
-            sub = Subscription(user=request.user, company=comp, quantity=quantity, offer_bid=offer_bid)
+            sub = Subscription(user=request.user, company=comp, quantity=no_of_lots, offer_bid=offer_bid)
             sub.save()
             history = UserHistory(user = request.user, company=comp, no_of_shares=quantity, bid_price=offer_bid, buy_or_sell=True)
             history.save()  

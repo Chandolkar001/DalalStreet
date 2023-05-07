@@ -16,6 +16,7 @@ def resolve_ipo_allotment():
     ipo = list(IPO.objects.all())
     for ip in ipo:
         ipo = IPO.objects.get(id=ip.id)
+        print(ipo)
         subscriptions = Subscription.objects.filter(company=ipo.company).order_by('-offer_bid')
         total_applied_lots = sum([s.quantity for s in subscriptions])
         total_applied_shares = total_applied_lots * ipo.lot_size
@@ -25,8 +26,8 @@ def resolve_ipo_allotment():
         if total_applied_shares > ipo.total_volume:
             final_issue_price = ipo.high_cap 
         else:
-            final_issue_price = total_offer / len(list(subscriptions))
-        
+            final_issue_price = total_offer / (len(list(subscriptions)) * ipo.lot_size)
+        print(final_issue_price, total_offer)
         shares_allotted = 0
         cash_received = 0
     

@@ -40,25 +40,26 @@ class LeaderboardView(generics.ListAPIView):
 
 class AddIPOSubscriptionView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = SubscriptionSerializer
 
     def post(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
-        company_id = int(request.data['company'])
+        company_id = request.data['company']
         offer_bid = int(request.data['offer_bid'])
         no_of_lots = int(request.data['quantity'])
 
         ipo_comp = Company.objects.filter(company_id = company_id).first()
-        ipo = IPO.objects.filter(company=ipo_comp).first()
+        ipo = IPO.objects.filter(company=company_id).first()
+        print(ipo, ipo_comp)
         quantity = ipo.lot_size * no_of_lots
+        print(quantity)
         attempts = len(Subscription.objects.filter(user=user, company=company_id))
         if attempts >= 3:
             return Response({"message" : "Max attempts for this IPO reached!"}, status=status.HTTP_400_BAD_REQUEST)
 
         if checkifvalidIPO(company_id, quantity, offer_bid):
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(user=request.user)
+            comp = Company.objects.filter(company_id=company_id).first()
+            sub = Subscription(user=request.user, company=comp, quantity=quantity, offer_bid=offer_bid)
+            sub.save()
             return Response({"message" : "Subscription success"}, status=status.HTTP_201_CREATED)
 
         return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)

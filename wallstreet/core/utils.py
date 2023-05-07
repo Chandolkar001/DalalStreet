@@ -3,13 +3,11 @@ from datetime import datetime, timedelta, date
 import time
 
 def checkifvalidIPO(company_id, quantity, offer_bid):
-    low_cap = IPO.objects.get(company = company_id).low_cap
-    high_cap = IPO.objects.get(company = company_id).high_cap
-    total_volume = IPO.objects.get(company = company_id).total_volume
-    closing_date = IPO.objects.get(company = company_id).closing_date
-    if date.today() > closing_date:
+    ipo_comp = Company.objects.filter(company_id=company_id).first()
+    ipo = IPO.objects.filter(company=company_id).first()
+    if date.today() > ipo.closing_date:
         return False
-    elif (low_cap <= offer_bid and offer_bid <= high_cap and quantity <= total_volume):
+    elif (ipo.low_cap <= offer_bid and offer_bid <= ipo.high_cap and quantity <= ipo.total_volume):
         return True
     else:
         return False

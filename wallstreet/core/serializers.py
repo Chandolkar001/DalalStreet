@@ -25,21 +25,38 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         Profile.objects.update_or_create(user_id = user)
         return user
-
-class ProfileSerializer(serializers.ModelSerializer):
-    user_name = serializers.SerializerMethodField('get_user_name', read_only=True)
-
-    class Meta:
-        model = Profile
-        fields = "__all__"
-
-    def get_user_name(self,profile_obj):
-        return profile_obj.user_id.username
-
+    
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = "__all__"
+    
+class UserHistorySerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    company = CompanySerializer()
+
+    class Meta:
+        model = UserHistory
+        fields = "__all__"
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField('get_user_name', read_only=True)
+    user_id = UserSerializer()
+    user_history = UserHistorySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ["user_id", "rank", "no_of_shares", "cash", "net_worth"]
+
+    def get_user_name(self,profile_obj):
+        return profile_obj.user_id.username
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        if request:
+            user = request.user
+            self.fields['user_history'] = UserHistorySerializer(many=True, read_only=True, queryset=UserHistory.objects.filter(user=user))
 
 class IPOSerializer(serializers.ModelSerializer):
     company = CompanySerializer()
@@ -88,12 +105,12 @@ class SellOrderSerializer(serializers.ModelSerializer):
 
 # ShortOrderSerializer to be implemented
 
-class ShortOrderSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+# class ShortOrderSerializer(serializers.ModelSerializer):
+#     user = serializers.SerializerMethodField()
 
-    def get_user(self, instance):
-        return self.context['request'].user
+#     def get_user(self, instance):
+#         return self.context['request'].user
         
-    class Meta:
-        model = ShortOrder
-        fields = ["user", "company", "time_placed", "quantity", "price","closed_at"]
+#     class Meta:
+#         model = ShortOrder
+#         fields = ["user", "company", "time_placed", "quantity", "price","closed_at"]

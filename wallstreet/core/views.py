@@ -1,4 +1,4 @@
-from rest_framework import generics, views, status
+from rest_framework import generics, views, status, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from .utils import checkifvalidIPO
@@ -49,9 +49,7 @@ class AddIPOSubscriptionView(generics.CreateAPIView):
 
         ipo_comp = Company.objects.filter(company_id = company_id).first()
         ipo = IPO.objects.filter(company=company_id).first()
-        print(ipo, ipo_comp)
         quantity = ipo.lot_size * no_of_lots
-        print(quantity)
         attempts = len(Subscription.objects.filter(user=user, company=company_id))
         if attempts >= 3:
             return Response({"message" : "Max attempts for this IPO reached!"}, status=status.HTTP_400_BAD_REQUEST)
@@ -60,6 +58,8 @@ class AddIPOSubscriptionView(generics.CreateAPIView):
             comp = Company.objects.filter(company_id=company_id).first()
             sub = Subscription(user=request.user, company=comp, quantity=quantity, offer_bid=offer_bid)
             sub.save()
+            history = UserHistory(user = request.user, company=comp, no_of_shares=quantity, bid_price=offer_bid, buy_or_sell=True)
+            history.save()  
             return Response({"message" : "Subscription success"}, status=status.HTTP_201_CREATED)
 
         return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)
@@ -114,3 +114,8 @@ class AddSellOrderView(generics.CreateAPIView):
             serializer.save(user=request.user)
             return Response({"message" : "Sell Order placed successfully"}, status=status.HTTP_201_CREATED)
         return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]

@@ -2,6 +2,14 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime
 
+class Market(models.Model):
+    sensex = models.FloatField(default=0)
+    spread = models.IntegerField(default=0)
+    bid_range = models.FloatField(default=0)
+    market_on = models.BooleanField(default=True)
+    start_news = models.BooleanField(default=True)
+    news_counter = models.IntegerField(default=0)
+
 class User(AbstractUser):
     phone_no = models.CharField(max_length=10, null=True)
 
@@ -61,9 +69,6 @@ class Subscription(models.Model):
     def __str__(self):
         return str(self.id)
 
-# class Stock(models.Model):
-
-
 class BuyOrder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
@@ -83,6 +88,14 @@ class SellOrder(models.Model):
 
     def __str__(self):
         return str(self.id)
+    
+class UserHistory(models.Model):
+    user= models.ForeignKey(Profile, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete= models.CASCADE)
+    no_of_shares = models.IntegerField(default=0)
+    bid_price = models.IntegerField(default=0)
+    buy_or_sell = models.BooleanField(default=False)
+    transaction_time = models.DateTimeField(auto_now_add=True)
 
 # # Shorting application to be implemented. 
 # class ShortOrder(models.Model):
@@ -95,18 +108,18 @@ class SellOrder(models.Model):
 #     def __str__(self):
 #         return str(self.id)
     
-class ShortOrder(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    price = models.IntegerField()
-    time_placed = models.DateTimeField(auto_now_add=True)
-    closed_at = models.DateTimeField(null=True, blank=True)
-    # status = models.CharField(max_length=10, default='Open')
-    # profit_loss = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+# class ShortOrder(models.Model):
+#     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     quantity = models.IntegerField()
+#     price = models.IntegerField()
+#     time_placed = models.DateTimeField(auto_now_add=True)
+#     closed_at = models.DateTimeField(null=True, blank=True)
+#     # status = models.CharField(max_length=10, default='Open')
+#     # profit_loss = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
-    def __str__(self):
-        return str(self.id)
+#     def __str__(self):
+#         return str(self.id)
 
 
 

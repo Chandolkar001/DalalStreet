@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-_6hc2#-3a-%75dtfp%n2gehvs4aa9d&)(_&3sz_aeay7xv)z@g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['api.wallstreet.credenz.in', '104.211.90.191', '127.0.0.1']
+ALLOWED_HOSTS = ['api.wallstreet.credenz.in', '104.211.90.191', '127.0.0.1', 'localhost']
 
 
 # Application definition

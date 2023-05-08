@@ -4,3 +4,4 @@ WORKDIR /usr/src/wallstreet
 COPY requirements.txt ./
 RUN apk add --no-cache bash
 RUN pip install -r requirements.txt
+RUN pip install gunicorn

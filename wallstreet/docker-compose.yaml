@@ -5,7 +5,7 @@ services:
         build: .
         container_name: django
         command : bash -c "python manage.py makemigrations && python manage.py migrate &&
-                      python manage.py runserver 0.0.0.0:8000"
+                      gunicorn wallstreet.wsgi:application --bind 0.0.0.0:8000 --timeout 1800"
         volumes:
             - .:/usr/src/wallstreet
         ports:

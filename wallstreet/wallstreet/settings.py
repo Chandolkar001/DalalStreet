@@ -59,7 +59,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'https://wallstreet.credenz.in/',
+]
 
 ROOT_URLCONF = 'wallstreet.urls'
 

@@ -50,7 +50,8 @@ class AddIPOSubscriptionView(generics.CreateAPIView):
         ipo_comp = Company.objects.filter(company_id = company_id).first()
         ipo = IPO.objects.filter(company=company_id).first()
         quantity = ipo.lot_size * no_of_lots
-        attempts = len(Subscription.objects.filter(user=user, company=company_id))
+        attempts = len(Subscription.objects.filter(user=user, company=Company.objects.get(company_id=company_id)))
+        print(attempts)
         if attempts >= 3:
             return Response({"message" : "Max attempts for this IPO reached!"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -58,7 +59,7 @@ class AddIPOSubscriptionView(generics.CreateAPIView):
             comp = Company.objects.filter(company_id=company_id).first()
             sub = Subscription(user=request.user, company=comp, quantity=no_of_lots, offer_bid=offer_bid)
             sub.save()
-            history = UserHistory(user = request.user, company=comp, no_of_shares=quantity, bid_price=offer_bid, buy_or_sell=True)
+            history = UserHistory(user = User.objects.get(username=request.user.username), company=comp, no_of_shares=quantity, bid_price=offer_bid, buy_or_sell=True)
             history.save()  
             return Response({"message" : "Subscription success"}, status=status.HTTP_201_CREATED)
 

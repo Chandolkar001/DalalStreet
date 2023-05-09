@@ -61,7 +61,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'https://wallstreet.credenz.in/',
+    'https://wallstreet.credenz.in',
 ]
 
 ROOT_URLCONF = 'wallstreet.urls'

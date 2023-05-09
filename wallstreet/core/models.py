@@ -90,7 +90,7 @@ class SellOrder(models.Model):
         return str(self.id)
     
 class UserHistory(models.Model):
-    user= models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete= models.CASCADE)
     no_of_shares = models.IntegerField(default=0)
     bid_price = models.IntegerField(default=0)

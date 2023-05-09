@@ -79,6 +79,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         fields = ["user", "company", "quantity", "offer_bid"]
 
 class SubsSerializer(serializers.ModelSerializer):
+    company = CompanySerializer()
     class Meta:
         model = Subscription
         fields = ["company", "quantity", "offer_bid"]

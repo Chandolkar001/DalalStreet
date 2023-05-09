@@ -116,3 +116,77 @@ def match_orders():
                 seller_profile.cash -= seller_cash_delta
                 buyer.save()
                 seller.save()
+
+def match_buy_order(buy_order, sell_orders):
+    buy_user = buy_order.user
+    buyer = User.filter(user=buy_user)
+    # Filter out sell orders with a higher ask price than the bid price of the buy order
+    sell_orders = [so for so in sell_orders if so.ask_price <= buy_order.bid_price]
+    
+    # Sort remaining sell orders by time placed
+    sell_orders = sorted(sell_orders, key=lambda so: so.time_placed)
+    
+    # Match the buy order with the oldest sell order
+    for sell_order in sell_orders:
+        sell_user = sell_order.user
+        seller = User.filter(user=sell_user)
+        if buy_order.quantity <= 0:
+            break
+        if sell_order.quantity <= 0:
+            continue
+        match_quantity = min(buy_order.quantity, sell_order.quantity)
+        buy_order.quantity -= match_quantity
+        sell_order.quantity -= match_quantity
+        seller.cash += match_quantity*sell_order.ask_price
+        buyer.cash -= match_quantity*buy_order.bid_price
+        buyer.no_of_shares += match_quantity
+        seller.no_of_shares -= match_quantity
+        buyer.save()
+        seller.save()
+    return (sell_orders, buy_order)
+
+def match_sell_order(sell_order, buy_orders):
+    sell_user = sell_order.user
+    seller = User.filter(user=sell_user)
+
+    # Filter out buy orders with a lower bid price than the ask price of the sell order
+    buy_orders = [bo for bo in buy_orders if bo.bid_price >= sell_order.ask_price]
+    
+    # Sort remaining buy orders by time placed
+    buy_orders = sorted(buy_orders, key=lambda bo: bo.time_placed)
+    
+    # Match the sell order with the oldest buy order
+    for buy_order in buy_orders:
+        buy_user = buy_order.user
+        buyer = User.filter(user=buy_user)
+        if sell_order.quantity <= 0:
+            break
+        if buy_order.quantity <= 0:
+            continue
+        match_quantity = min(sell_order.quantity, buy_order.quantity)
+        sell_order.quantity -= match_quantity
+        buy_order.quantity -= match_quantity
+        seller.cash += match_quantity*sell_order.ask_price
+        buyer.cash -= match_quantity*buy_order.bid_price
+        buyer.no_of_shares += match_quantity
+        seller.no_of_shares -= match_quantity
+        buyer.save()
+        seller.save()
+
+    return (buy_orders, sell_order)
+def match():
+    companies = company.objects.all()
+    for company in companies:
+        buy_orders = BuyOrder.objects.filter(company=company).order_by('-time_placed')
+        sell_orders = SellOrder.objects.filter(company=company).order_by('time_placed')
+    while buy_orders and sell_orders:
+        sell_orders, buy_order = match_buy_order(buy_orders[0], sell_orders)
+        if buy_order.quantity <= 0:
+            buy_orders = buy_orders[1:]
+        else:
+            break
+        buy_orders, sell_order = match_sell_order(sell_orders[0], buy_orders)
+        if sell_order.quantity <= 0:
+            sell_orders = sell_orders[1:]
+        else:
+            break

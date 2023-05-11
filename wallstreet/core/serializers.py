@@ -88,7 +88,7 @@ class BuyOrderSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
 
     def get_user(self, instance):
-        return self.context['request'].user
+        return self.context['request'].user.username
         
     class Meta:
         model = BuyOrder
@@ -98,7 +98,7 @@ class SellOrderSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
 
     def get_user(self, instance):
-        return self.context['request'].user
+        return self.context['request'].user.username
         
     class Meta:
         model = SellOrder

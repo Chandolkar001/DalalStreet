@@ -14,7 +14,7 @@ class UserAdmin(admin.ModelAdmin):
     )
     
 class PortfolioAdmin(admin.ModelAdmin):
-    list_display = ('rank', 'user_id', 'no_of_shares', 'cash', 'net_worth')
+    list_display = ('rank', 'user_id', 'cash', 'net_worth')
 
     class Meta:
         ordering = ['rank']
@@ -40,6 +40,9 @@ class BuyOrderAdmin(admin.ModelAdmin):
 class SellOrderAdmin(admin.ModelAdmin):
     list_display = ('company', 'user', 'time_placed', 'quantity', 'ask_price')
 
+class CompanySharesAdmin(admin.ModelAdmin):
+    list_display = ('company', 'profile', 'shares')
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Profile, PortfolioAdmin)
 admin.site.register(Company, CompanyAdmin)
@@ -47,4 +50,6 @@ admin.site.register(IPO, IPOAdmin)
 admin.site.register(Subscription, SubsAdmin)
 admin.site.register(BuyOrder, BuyOrderAdmin)
 admin.site.register(SellOrder, SellOrderAdmin)
+admin.site.register(CompanyShares, CompanySharesAdmin)
+admin.site.register(UserHistory)
 # admin.site.register(News)

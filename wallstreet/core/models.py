@@ -19,7 +19,6 @@ class User(AbstractUser):
 class Profile(models.Model):
     user_id = models.OneToOneField(User, on_delete=models.CASCADE)
     rank = models.IntegerField(default=-1)
-    no_of_shares = models.IntegerField(default=0)
     cash = models.IntegerField(default=200000)
     net_worth = models.IntegerField(default=0) # 60 % share valuation 40 % cash valuation
     

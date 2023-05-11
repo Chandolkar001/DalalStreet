@@ -88,6 +88,8 @@ class AddBuyOrderView(generics.CreateAPIView):
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
+            history = UserHistory(user = User.objects.get(username=request.user.username), company=company_id, no_of_shares=quantity, bid_price=bid_price, buy_or_sell=True)
+            history.save()  
             return Response({"message" : "Buy Order placed successfully"}, status=status.HTTP_201_CREATED)
         return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -113,6 +115,8 @@ class AddSellOrderView(generics.CreateAPIView):
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
+            history = UserHistory(user = User.objects.get(username=request.user.username), company=company_id, no_of_shares=quantity, bid_price=ask_price, buy_or_sell=False)
+            history.save()
             return Response({"message" : "Sell Order placed successfully"}, status=status.HTTP_201_CREATED)
         return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -40,23 +40,16 @@ class UserHistorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user_name = serializers.SerializerMethodField('get_user_name', read_only=True)
     user_id = UserSerializer()
-    user_history = UserHistorySerializer(many=True, read_only=True)
-
+    user_history = serializers.SerializerMethodField()
     class Meta:
         model = Profile
-        fields = ["user_id", "rank", "no_of_shares", "cash", "net_worth"]
+        fields = ('rank', 'cash', 'net_worth', 'user_id', 'user_history')
 
-    def get_user_name(self,profile_obj):
-        return profile_obj.user_id.username
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        if request:
-            user = request.user
-            self.fields['user_history'] = UserHistorySerializer(many=True, read_only=True, queryset=UserHistory.objects.filter(user=user))
+    def get_user_history(self, obj):
+        user_history = UserHistory.objects.filter(user_id=obj.user_id)
+        serializer = UserHistorySerializer(user_history, many=True)
+        return serializer.data
 
 class IPOSerializer(serializers.ModelSerializer):
     company = CompanySerializer()

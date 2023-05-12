@@ -14,5 +14,6 @@ urlpatterns = [
     path("SellOrders/", SellOrderView.as_view(),name="sell-orders"),
     path("AddSellOrders/", AddSellOrderView.as_view(),name="sell-orders"),
     path("leaderboard/", LeaderboardView.as_view(), name="leaderboard"),
+    path("profile/", ProfileView.as_view(), name="profile")
     
 ]

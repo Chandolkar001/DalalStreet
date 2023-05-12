@@ -142,7 +142,9 @@ class AddSellOrderView(generics.CreateAPIView):
             
         return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)
 
-class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+class ProfileView(generics.RetrieveAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.profile

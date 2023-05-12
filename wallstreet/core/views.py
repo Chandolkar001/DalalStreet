@@ -129,13 +129,15 @@ class AddSellOrderView(generics.CreateAPIView):
         if comp_shares == None:
             return Response({"message" : "You dont own the share!"}, status=status.HTTP_400_BAD_REQUEST)
         elif quantity > comp_shares.shares:
-            return Response({"message" : "Not enough shares"}, status=status.HTTP_201_CREATED)
+            return Response({"message" : "Not enough shares"}, status=status.HTTP_400_BAD_REQUEST)
         elif (ask_price <= (0.1*comp.last_traded_price+comp.last_traded_price) and ask_price >= (comp.last_traded_price - 0.1*comp.last_traded_price)):
+            comp_shares.shares -= quantity
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
             history = UserHistory(user = User.objects.get(username=request.user.username), company=Company.objects.get(company_id=c_id), no_of_shares=quantity, bid_price=ask_price, buy_or_sell=False)
             history.save()
+            comp_shares.save()
             return Response({"message" : "Sell Order placed successfully"}, status=status.HTTP_201_CREATED)
             
         return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)

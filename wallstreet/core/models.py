@@ -21,6 +21,7 @@ class Profile(models.Model):
     rank = models.IntegerField(default=-1)
     cash = models.IntegerField(default=200000)
     net_worth = models.IntegerField(default=0) # 60 % share valuation 40 % cash valuation
+    is_hidden = models.BooleanField(default=False)
     
     def __str__(self) -> str:
         return self.user_id.username + "'s Profile"

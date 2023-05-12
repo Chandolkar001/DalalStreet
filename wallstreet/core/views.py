@@ -39,7 +39,7 @@ class IPOSubscriptionView(generics.ListAPIView):
 
 class LeaderboardView(generics.ListAPIView):
     queryset = (
-        Profile.objects.all().order_by("-net_worth")
+        Profile.objects.filter(is_hidden=False).order_by("-net_worth")
     )
 
     serializer_class = ProfileSerializer

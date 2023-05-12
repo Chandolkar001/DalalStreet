@@ -14,7 +14,7 @@ class UserAdmin(admin.ModelAdmin):
     )
     
 class PortfolioAdmin(admin.ModelAdmin):
-    list_display = ('rank', 'user_id', 'cash', 'net_worth')
+    list_display = ('rank', 'user_id', 'cash', 'net_worth', 'is_hidden')
 
     class Meta:
         ordering = ['rank']

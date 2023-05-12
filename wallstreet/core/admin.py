@@ -3,7 +3,7 @@ from .models import *
 from import_export.admin import ImportExportActionModelAdmin
 from .utils import resolve_ipo_allotment
 
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(ImportExportActionModelAdmin):
     list_display = ('username','email')
     fieldsets = (
         (None, {
@@ -13,19 +13,24 @@ class UserAdmin(admin.ModelAdmin):
         }),
     )
     
-class PortfolioAdmin(admin.ModelAdmin):
+class PortfolioAdmin(ImportExportActionModelAdmin):
     list_display = ('rank', 'user_id', 'cash', 'net_worth', 'is_hidden')
+    actions = ['increase_cap']
 
+    def increase_cap(self, request, queryset):
+        queryset.update(cash=10000000)
+        self.message_user(request, 'Increased cap to 1 CR')
+    increase_cap.short_description = 'Increase cap'
     class Meta:
         ordering = ['rank']
 
 class CompanyAdmin(ImportExportActionModelAdmin):
     list_display = ('company_name', 'total_no_shares', 'is_listed')
 
-class IPOAdmin(admin.ModelAdmin):
+class IPOAdmin(ImportExportActionModelAdmin):
     list_display = ('company', 'high_cap', 'low_cap', 'lot_size', 'total_volume', 'final_issue_price', 'shares_alloted', 'cash_received')
 
-class SubsAdmin(admin.ModelAdmin):
+class SubsAdmin(ImportExportActionModelAdmin):
     list_display = ('user', 'company', 'quantity', 'offer_bid')
     actions = ['resolve_ipo']
 

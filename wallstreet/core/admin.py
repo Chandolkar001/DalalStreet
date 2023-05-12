@@ -43,6 +43,10 @@ class SellOrderAdmin(admin.ModelAdmin):
 class CompanySharesAdmin(admin.ModelAdmin):
     list_display = ('company', 'profile', 'shares')
 
+class MarketAdmin(admin.ModelAdmin):
+    list_display = ('id', 'market_on')
+
+admin.site.register(Market, MarketAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Profile, PortfolioAdmin)
 admin.site.register(Company, CompanyAdmin)

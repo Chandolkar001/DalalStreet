@@ -206,21 +206,22 @@ def match_sell_order(sell_order, buy_orders, company_id):
         seller_comp.save()
 
     return (buy_orders, sell_order)
+
 def to_match():
     companies = Company.objects.all()
     print("task_entered")
     print(companies)
-    for company in companies:
-        buy_orders = BuyOrder.objects.filter(company=company.company_id).order_by('time_placed')
-        sell_orders = SellOrder.objects.filter(company=company.id).order_by('time_placed')
-    while buy_orders and sell_orders:
-        sell_orders, buy_order = match_buy_order(buy_orders[0], sell_orders, company.id)
-        if buy_order.quantity <= 0:
-            buy_orders = buy_orders[1:]
-        else:
-            break
-        buy_orders, sell_order = match_sell_order(sell_orders[0], buy_orders, company.id)
-        if sell_order.quantity <= 0:
-            sell_orders = sell_orders[1:]
-        else:
-            break
+    # for company in companies:
+    #     buy_orders = BuyOrder.objects.filter(company=company.company_id).order_by('time_placed')
+    #     sell_orders = SellOrder.objects.filter(company=company.id).order_by('time_placed')
+    # while buy_orders and sell_orders:
+    #     sell_orders, buy_order = match_buy_order(buy_orders[0], sell_orders, company.id)
+    #     if buy_order.quantity <= 0:
+    #         buy_orders = buy_orders[1:]
+    #     else:
+    #         break
+    #     buy_orders, sell_order = match_sell_order(sell_orders[0], buy_orders, company.id)
+    #     if sell_order.quantity <= 0:
+    #         sell_orders = sell_orders[1:]
+    #     else:
+    #         break

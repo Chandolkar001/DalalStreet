@@ -39,16 +39,28 @@ class UserHistorySerializer(serializers.ModelSerializer):
         model = UserHistory
         fields = "__all__"
 
+class CompanyShareSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= CompanyShares
+        fields = "__all__"
+
 class ProfileSerializer(serializers.ModelSerializer):
     user_id = UserSerializer()
     user_history = serializers.SerializerMethodField()
+    user_shares = serializers.SerializerMethodField()
+
     class Meta:
         model = Profile
-        fields = ('rank', 'cash', 'net_worth', 'user_id', 'user_history')
+        fields = ('rank', 'cash', 'net_worth', 'user_id', 'user_history', 'user_shares')
 
     def get_user_history(self, obj):
         user_history = UserHistory.objects.filter(user_id=obj.user_id)
         serializer = UserHistorySerializer(user_history, many=True)
+        return serializer.data
+    
+    def get_user_shares(self, obj):
+        user_shares = CompanyShares.objects.filter(profile=obj.user_id)
+        serializer = CompanyShareSerializer(user_shares, many = True)
         return serializer.data
 
 class IPOSerializer(serializers.ModelSerializer):

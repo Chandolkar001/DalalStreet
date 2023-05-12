@@ -8,3 +8,8 @@ class NewsListView(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     serializer_class = NewsSerializer
     queryset = News.getPublishedNews()
+
+class NewsDetailView(generics.RetrieveAPIView):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = NewsSerializer
+    queryset = News.getPublishedNews()

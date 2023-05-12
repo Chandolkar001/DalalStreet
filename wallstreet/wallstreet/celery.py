@@ -11,6 +11,14 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'match_order_task': {
         'task': 'core.tasks.match_order_task',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='*/15'),
+    },
+    'graph_val': {
+        'task': 'core.tasks.graph_val',
+        'schedule': crontab(minute='*/20'),
+    },
+    'news_update': {
+        'task': 'news.tasks.news_update',
+        'schedule': crontab(minute='*/15'),
     },
 }

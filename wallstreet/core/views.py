@@ -90,16 +90,22 @@ class AddBuyOrderView(generics.CreateAPIView):
             bid_price = int(request.data['bid_price']) 
             profile  = Profile.objects.filter(user_id=request.user.id).first()
             comp = Company.objects.filter(id=company_id).first()
+            print(comp)
             c_id = comp.company_id
             if profile.cash < bid_price:
                  return Response({"message" : "You don not have enough cash"}, status=status.HTTP_400_BAD_REQUEST)
-
+            print("check")
             if (bid_price <= (0.1*comp.last_traded_price+comp.last_traded_price) and bid_price >= (comp.last_traded_price - 0.1*comp.last_traded_price)):
-                serializer = self.get_serializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save(user=request.user)
+                # serializer = self.get_serializer(data=request.data)
+                # serializer.is_valid(raise_exception=True)
+                # print("check")
+                # serializer.save(user=request.user, company=comp)
+                buy_order = BuyOrder(user=request.user, company=Company.objects.get(company_id=c_id), quantity=quantity, bid_price=bid_price)
                 history = UserHistory(user = User.objects.get(username=request.user.username), company=Company.objects.get(company_id=c_id), no_of_shares=quantity, bid_price=bid_price, buy_or_sell=True)
+                comp_shares = CompanyShares(profile=User.objects.get(username=request.user.username), company=Company.objects.get(company_id=c_id), shares=0)
                 history.save()  
+                buy_order.save()
+                comp_shares.save()
                 return Response({"message" : "Buy Order placed successfully"}, status=status.HTTP_201_CREATED)
             return Response({"message" : "try again!"}, status=status.HTTP_400_BAD_REQUEST)
         else:

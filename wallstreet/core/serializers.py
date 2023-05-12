@@ -40,6 +40,7 @@ class UserHistorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class CompanyShareSerializer(serializers.ModelSerializer):
+    company = CompanySerializer()
     class Meta:
         model= CompanyShares
         fields = "__all__"

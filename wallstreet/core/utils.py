@@ -42,12 +42,18 @@ def resolve_ipo_allotment():
     
             cash_received += lots_allotted * final_issue_price * ipo.lot_size
             profile = Profile.objects.filter(user_id = s.user).first()
+            s_user = User.objects.filter(id=s.user.id).first()
             # profile.no_of_shares += lots_allotted * ipo.lot_size
-            company_shares = CompanyShares(company=ipo.company,profile=profile,shares=lots_allotted*ipo.lot_size)
+            if not CompanyShares.objects.filter(profile=s_user, company=ipo.company).first():
+                company_shares = CompanyShares(company=ipo.company,profile=s_user,shares=lots_allotted*ipo.lot_size)
+                company_shares.save()
+            else:
+                company_shares = CompanyShares.objects.filter(company=ipo.company,profile=s_user).first()
+                company_shares.shares += lots_allotted*ipo.lot_size
+                company_shares.save()
             profile.cash -= lots_allotted * final_issue_price * ipo.lot_size
             profile.net_worth += int(lots_allotted * ipo.lot_size * final_issue_price * 0.6 + profile.cash * 0.4)
             profile.save()
-            company_shares.save()
     
             ipo.subscribers.add(s.user)
     
@@ -57,6 +63,13 @@ def resolve_ipo_allotment():
         ipo.shares_allotted = shares_allotted
         ipo.cash_received = cash_received
         ipo.save()
+
+        company = Company.objects.filter(id=ipo.company.id).first()
+        company.is_listed = True
+        company.last_traded_price = final_issue_price
+        company.listing_price = final_issue_price
+        company.last_traded_prices.append(int(final_issue_price))
+        company.save()
 
 orders = []
 def add_order(order_type, price, quantity):
@@ -124,11 +137,14 @@ def match_buy_order(buy_order, sell_orders, company_id):
     print("buy_order")
     buy_user = buy_order.user
     buyer = Profile.objects.get(user_id=buy_user)
+    company = Company.objects.filter(id=company_id).first()
     # Filter out sell orders with a higher ask price than the bid price of the buy order
     sell_orders = [so for so in sell_orders if so.ask_price <= buy_order.bid_price]
     
     # Sort remaining sell orders by time placed
-    sell_orders = sorted(sell_orders, key=lambda so: so.time_placed)
+    # sell_orders = sorted(sell_orders, key=lambda so: so.time_placed)
+
+    sell_orders = sorted(sell_orders, key=lambda so: ( -so.ask_price, so.time_placed))
     
     # Match the buy order with the oldest sell order
     for sell_order in sell_orders:
@@ -143,11 +159,16 @@ def match_buy_order(buy_order, sell_orders, company_id):
         sell_order.quantity -= match_quantity
         
         # update company share
-        seller_comp = CompanyShares.objects.filter(profile=seller, company=company_id).first()
-        buyer_comp = CompanyShares.objects.filter(profile=buyer, company=company_id).first()
+        seller_comp = CompanyShares.objects.filter(profile=sell_user, company=company).first()
+        buyer_comp = CompanyShares.objects.filter(profile=buy_user, company=company).first()
 
         seller.cash += match_quantity*sell_order.ask_price
         buyer.cash -= match_quantity*buy_order.bid_price
+
+        company.last_traded_price = buy_order.bid_price
+        print(company.last_traded_prices)
+        company.last_traded_prices.append(buy_order.bid_price)
+        company.save()
 
         buyer_comp.shares += match_quantity
         seller_comp.shares -= match_quantity
@@ -157,6 +178,12 @@ def match_buy_order(buy_order, sell_orders, company_id):
 
         buy_order.save()
         sell_order.save()
+
+        # flush if 0
+        if buy_order.quantity == 0:
+            buy_order.delete()
+        elif sell_order.quantity == 0:
+            sell_order.delete()
 
         buyer_comp.save()
         seller_comp.save()
@@ -168,11 +195,15 @@ def match_sell_order(sell_order, buy_orders, company_id):
     sell_user = sell_order.user
     seller = Profile.objects.filter(user_id=sell_user).first()
 
+    company = Company.objects.filter(id=company_id).first()
+
     # Filter out buy orders with a lower bid price than the ask price of the sell order
     buy_orders = [bo for bo in buy_orders if bo.bid_price >= sell_order.ask_price]
     
     # Sort remaining buy orders by time placed
-    buy_orders = sorted(buy_orders, key=lambda bo: bo.time_placed)
+    # buy_orders = sorted(buy_orders, key=lambda bo: bo.time_placed)
+
+    buy_orders = sorted(buy_orders, key=lambda bo: (bo.bid_price, bo.time_placed))
     
     # Match the sell order with the oldest buy order
     for buy_order in buy_orders:
@@ -187,11 +218,15 @@ def match_sell_order(sell_order, buy_orders, company_id):
         buy_order.quantity -= match_quantity
 
         # update company share
-        seller_comp = CompanyShares.objects.filter(profile=seller, company=company_id).first()
-        buyer_comp = CompanyShares.objects.filter(profile=buyer, company=company_id).first()
+        seller_comp = CompanyShares.objects.filter(profile=sell_user, company=company_id).first()
+        buyer_comp = CompanyShares.objects.filter(profile=buy_user, company=company_id).first()
 
         seller.cash += match_quantity*sell_order.ask_price
         buyer.cash -= match_quantity*buy_order.bid_price
+
+        company.last_traded_price = buy_order.bid_price
+        company.last_traded_prices.append(buy_order.bid_price)
+        company.save()
 
         buyer_comp.shares += match_quantity
         seller_comp.shares -= match_quantity
@@ -202,6 +237,12 @@ def match_sell_order(sell_order, buy_orders, company_id):
         buy_order.save()
         sell_order.save()
 
+        # flush if 0
+        if buy_order.quantity == 0:
+            buy_order.delete()
+        elif sell_order.quantity == 0:
+            sell_order.delete()
+
         buyer_comp.save()
         seller_comp.save()
 
@@ -210,18 +251,19 @@ def match_sell_order(sell_order, buy_orders, company_id):
 def to_match():
     companies = Company.objects.all()
     print("task_entered")
-    print(companies)
-    # for company in companies:
-    #     buy_orders = BuyOrder.objects.filter(company=company.company_id).order_by('time_placed')
-    #     sell_orders = SellOrder.objects.filter(company=company.id).order_by('time_placed')
-    # while buy_orders and sell_orders:
-    #     sell_orders, buy_order = match_buy_order(buy_orders[0], sell_orders, company.id)
-    #     if buy_order.quantity <= 0:
-    #         buy_orders = buy_orders[1:]
-    #     else:
-    #         break
-    #     buy_orders, sell_order = match_sell_order(sell_orders[0], buy_orders, company.id)
-    #     if sell_order.quantity <= 0:
-    #         sell_orders = sell_orders[1:]
-    #     else:
-    #         break
+    for company in companies:
+        buy_orders = BuyOrder.objects.filter(company=company.id)
+        sell_orders = SellOrder.objects.filter(company=company.id)
+        print(sell_orders, buy_orders)
+        while buy_orders and sell_orders:
+            print("check")
+            sell_orders, buy_order = match_buy_order(buy_orders[0], sell_orders, company.id)
+            if buy_order.quantity <= 0:
+                buy_orders = buy_orders[1:]
+            else:
+                break
+            buy_orders, sell_order = match_sell_order(sell_orders[0], buy_orders, company.id)
+            if sell_order.quantity <= 0:
+                sell_orders = sell_orders[1:]
+            else:
+                break

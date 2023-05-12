@@ -37,6 +37,8 @@ class Company(models.Model):
     is_listed = models.BooleanField(default=False)
     listing_price = models.IntegerField(default=0)
     last_traded_price = models.IntegerField(default=0)
+    # Chart
+    last_traded_prices = models.JSONField(default=list)
     def __str__(self) -> str:
         return self.company_name
 

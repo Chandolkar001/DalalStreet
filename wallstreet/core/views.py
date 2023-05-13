@@ -25,6 +25,18 @@ class CompanyDetailView(generics.RetrieveAPIView):
     serializer_class = CompanySerializer
     queryset = Company.objects.all()
 
+class CompanySharesView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CompanyShareSerializer
+    queryset = CompanyShares.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        id = self.request.query_params.get('id')
+        company = Company.objects.filter(id=id).first()
+        print(company)
+        queryset = self.queryset.filter(profile=user, company=company)
+        return queryset
 
 class IPOView(generics.ListAPIView):
     serializer_class = IPOSerializer

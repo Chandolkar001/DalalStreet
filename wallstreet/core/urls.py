@@ -6,6 +6,7 @@ urlpatterns = [
     path("all-players/", AllPlayerView.as_view(), name="all-players"),
     path("company/", CompanyListView.as_view(), name="company-list"),
     path("company/<int:pk>", CompanyDetailView.as_view(), name="company-list"),
+    path("companyshares/", CompanySharesView.as_view(), name="company-list"),
     path("IPO/", IPOView.as_view(), name = "ipo"),
     path("IPOSub/", IPOSubscriptionView.as_view(), name="ipo-subs" ),
     path("IPOAddSub/", AddIPOSubscriptionView.as_view(), name="add-ipo-subs" ),

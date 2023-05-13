@@ -39,16 +39,16 @@ class SubsAdmin(ImportExportActionModelAdmin):
         self.message_user(request, 'Function called successfully')
     resolve_ipo.short_description = 'IPO allotment'
 
-class BuyOrderAdmin(admin.ModelAdmin):
+class BuyOrderAdmin(ImportExportActionModelAdmin):
     list_display = ('company', 'user', 'time_placed', 'quantity', 'bid_price')
 
-class SellOrderAdmin(admin.ModelAdmin):
+class SellOrderAdmin(ImportExportActionModelAdmin):
     list_display = ('company', 'user', 'time_placed', 'quantity', 'ask_price')
 
-class CompanySharesAdmin(admin.ModelAdmin):
+class CompanySharesAdmin(ImportExportActionModelAdmin):
     list_display = ('company', 'profile', 'shares')
 
-class MarketAdmin(admin.ModelAdmin):
+class MarketAdmin(ImportExportActionModelAdmin):
     list_display = ('id', 'market_on')
 
 admin.site.register(Market, MarketAdmin)

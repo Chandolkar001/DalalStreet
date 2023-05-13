@@ -154,6 +154,11 @@ def match_buy_order(buy_order, sell_orders, company_id):
             break
         if sell_order.quantity <= 0:
             continue
+        seller_comp = CompanyShares.objects.filter(profile=sell_user, company=company).first()
+        if (seller_comp.shares == 0):
+            sell_order.delete()
+            continue
+
         match_quantity = min(buy_order.quantity, sell_order.quantity)
         buy_order.quantity -= match_quantity
         sell_order.quantity -= match_quantity

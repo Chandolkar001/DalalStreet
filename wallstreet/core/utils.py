@@ -212,18 +212,21 @@ def match_sell_order(sell_order, buy_orders, company_id):
     
     # Match the sell order with the oldest buy order
     for buy_order in buy_orders:
+        seller_comp = CompanyShares.objects.filter(profile=sell_user, company=company_id).first()
         buy_user = buy_order.user
         buyer = Profile.objects.filter(user_id=buy_user).first()
         if sell_order.quantity <= 0:
             break
         if buy_order.quantity <= 0:
             continue
+        if (seller_comp.shares == 0):
+            sell_order.delete()
+            continue
         match_quantity = min(sell_order.quantity, buy_order.quantity)
         sell_order.quantity -= match_quantity
         buy_order.quantity -= match_quantity
 
         # update company share
-        seller_comp = CompanyShares.objects.filter(profile=sell_user, company=company_id).first()
         buyer_comp = CompanyShares.objects.filter(profile=buy_user, company=company_id).first()
 
         seller.cash += match_quantity*sell_order.ask_price

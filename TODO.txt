@@ -8,3 +8,12 @@ Database Schema
 API endpoints
 Trading algorithm
 Integration of trading algorithm and gateway 
+
+Frontend pages:
+Login
+Instructions 
+Home
+Transaction page
+Portfolio page
+Profile page
+Analysis page
